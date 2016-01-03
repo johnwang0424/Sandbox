@@ -6,7 +6,11 @@ package com.johnwang.trident.trident.Common;
 public class CommonString {
     public static final String DEBUG_TAG = "DEBUG";
 
-    //** API endpoints */
+    //** Zoopla properties */
     public static final String ZOOPLA_LIST_PROPERTY_URL = "http://api.zoopla.co.uk/api/v1/property_listings.json";
     public static final String ZOOPLA_API_KEY = "xuxausrdv8fwms2fmwqppsfy";
+    public static final String ZOOPLA_JSON_LISTING = "listing";
+    public static final String ZOOPLA_JSON_STREET_NAME = "street_name";
+    public static final String ZOOPLA_JSON_AGENT_PHONE = "agent_phone";
+    public static final String ZOOPLA_JSON_PRICE = "price";
 }

@@ -10,6 +10,10 @@ import android.widget.ListView;
 import com.johnwang.trident.trident.Adapters.PropertyListingAdapter;
 import com.johnwang.trident.trident.Common.CommonString;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,15 +28,13 @@ public class MainActivity extends AppCompatActivity {
     private ListView propertyListing;
     private static String postcode = "ec1y0sj";
     private static String area = "Clerkenwell";
+    private static String listingStatus = "rent";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         propertyListing = (ListView) findViewById(R.id.property_listing);
-        List<Property> properties = new ArrayList<Property>();
-        PropertyListingAdapter adapter = new PropertyListingAdapter(this, R.layout.property_listing_item, properties);
-        propertyListing.setAdapter(adapter);
 
         new WebAsyncTask().execute(CommonString.ZOOPLA_LIST_PROPERTY_URL);
     }
@@ -52,8 +54,8 @@ public class MainActivity extends AppCompatActivity {
         protected String doInBackground(String... params) {
             InputStream is = null;
             try {
-                URL url = new URL(String.format("%s?api_key=%s&postcode=%s&area=%s",
-                        params[0], CommonString.ZOOPLA_API_KEY, postcode, area));
+                URL url = new URL(String.format("%s?api_key=%s&postcode=%s&area=%s&listing_status=%s",
+                        params[0], CommonString.ZOOPLA_API_KEY, postcode, area, listingStatus));
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
                 conn.setDoInput(true);
@@ -79,7 +81,10 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-
+            List<Property> properties = parseJson(result);
+            PropertyListingAdapter adapter = new PropertyListingAdapter(MainActivity.this,
+                    R.layout.property_listing_item, properties);
+            propertyListing.setAdapter(adapter);
         }
 
         // Reads an InputStream and converts it to a String.
@@ -91,6 +96,28 @@ public class MainActivity extends AppCompatActivity {
                 sb.append(line);
             }
             return sb.toString();
+        }
+
+        private List<Property> parseJson(String input) {
+            List<Property> properties = new ArrayList<Property>();
+            if (input == null) {
+                Log.d(CommonString.DEBUG_TAG, "input string is null");
+                return properties;
+            }
+            try {
+                JSONObject obj = new JSONObject(input);
+                JSONArray listings = obj.getJSONArray(CommonString.ZOOPLA_JSON_LISTING);
+                for (int a = 0; a < listings.length(); a++) {
+                    Property p = new Property();
+                    p.setStreetName(listings.getJSONObject(a).getString(CommonString.ZOOPLA_JSON_STREET_NAME));
+                    p.setAgentPhone(listings.getJSONObject(a).getString(CommonString.ZOOPLA_JSON_AGENT_PHONE));
+                    p.setPrice(listings.getJSONObject(a).getString(CommonString.ZOOPLA_JSON_PRICE));
+                    properties.add(p);
+                }
+            } catch (JSONException e) {
+                Log.d(CommonString.DEBUG_TAG, "can't parse input string", e);
+            }
+            return properties;
         }
     }
 }
