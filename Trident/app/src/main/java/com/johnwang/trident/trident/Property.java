@@ -1,5 +1,7 @@
 package com.johnwang.trident.trident;
 
+import android.graphics.Bitmap;
+
 /**
  * Class for a property.
  */
@@ -7,6 +9,15 @@ public class Property {
     private String streetName;
     private String agentPhone;
     private String price;
+    private Bitmap thumbnail;
+
+    public Bitmap getThumbnail() {
+        return thumbnail;
+    }
+
+    public void setThumbnail(Bitmap thumbnail) {
+        this.thumbnail = thumbnail;
+    }
 
     public String getStreetName() {
         return streetName;

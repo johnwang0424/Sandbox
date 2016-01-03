@@ -13,4 +13,5 @@ public class CommonString {
     public static final String ZOOPLA_JSON_STREET_NAME = "street_name";
     public static final String ZOOPLA_JSON_AGENT_PHONE = "agent_phone";
     public static final String ZOOPLA_JSON_PRICE = "price";
+    public static final String ZOOPLA_JSON_THUMBNAIL_URL = "image_url";
 }

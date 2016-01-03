@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.johnwang.trident.trident.Property;
@@ -30,13 +31,17 @@ public class PropertyListingAdapter extends ArrayAdapter<Property> {
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService
                 (Context.LAYOUT_INFLATER_SERVICE);
-        View v = inflater.inflate(R.layout.property_listing_item, parent, false);
-        TextView streetName = (TextView) v.findViewById(R.id.property_listing_street_name);
+        if (convertView == null) {
+            convertView = inflater.inflate(R.layout.property_listing_item, parent, false);
+        }
+        ImageView thumbnail = (ImageView) convertView.findViewById(R.id.property_listing_thumbnail);
+        thumbnail.setImageBitmap(properties.get(position).getThumbnail());
+        TextView streetName = (TextView) convertView.findViewById(R.id.property_listing_street_name);
         streetName.setText(properties.get(position).getStreetName());
-        TextView price = (TextView) v.findViewById(R.id.property_listing_price);
-        price.setText(properties.get(position).getPrice());
-        TextView agentPhone = (TextView) v.findViewById(R.id.property_listing_agent_phone);
+        TextView price = (TextView) convertView.findViewById(R.id.property_listing_price);
+        price.setText(String.format("£%s", properties.get(position).getPrice()));
+        TextView agentPhone = (TextView) convertView.findViewById(R.id.property_listing_agent_phone);
         agentPhone.setText(properties.get(position).getAgentPhone());
-        return v;
+        return convertView;
     }
 }

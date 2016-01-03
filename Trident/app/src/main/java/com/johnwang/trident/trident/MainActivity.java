@@ -1,5 +1,6 @@
 package com.johnwang.trident.trident;
 
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,9 +51,9 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Web request handler.
      */
-    private class WebAsyncTask extends AsyncTask<String, Void, String> {
+    private class WebAsyncTask extends AsyncTask<String, Void, List<Property>> {
         @Override
-        protected String doInBackground(String... params) {
+        protected List<Property> doInBackground(String... params) {
             InputStream is = null;
             try {
                 URL url = new URL(String.format("%s?api_key=%s&postcode=%s&area=%s&listing_status=%s",
@@ -64,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(CommonString.DEBUG_TAG, "Calling zoopla api returns " + conn.getResponseCode());
                 }
                 is = conn.getInputStream();
-                return readIt(is);
+                return parseJson(readIt(is));
             } catch (Exception e) {
                 Log.d(CommonString.DEBUG_TAG, e.getMessage());
             } finally {
@@ -80,8 +82,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(String result) {
-            List<Property> properties = parseJson(result);
+        protected void onPostExecute(List<Property> properties) {
             PropertyListingAdapter adapter = new PropertyListingAdapter(MainActivity.this,
                     R.layout.property_listing_item, properties);
             propertyListing.setAdapter(adapter);
@@ -112,10 +113,16 @@ public class MainActivity extends AppCompatActivity {
                     p.setStreetName(listings.getJSONObject(a).getString(CommonString.ZOOPLA_JSON_STREET_NAME));
                     p.setAgentPhone(listings.getJSONObject(a).getString(CommonString.ZOOPLA_JSON_AGENT_PHONE));
                     p.setPrice(listings.getJSONObject(a).getString(CommonString.ZOOPLA_JSON_PRICE));
+                    URL url = new URL(listings.getJSONObject(a).getString(CommonString.ZOOPLA_JSON_THUMBNAIL_URL));
+                    p.setThumbnail(BitmapFactory.decodeStream(url.openConnection().getInputStream()));
                     properties.add(p);
                 }
             } catch (JSONException e) {
-                Log.d(CommonString.DEBUG_TAG, "can't parse input string", e);
+                Log.d(CommonString.DEBUG_TAG, "Can't parse input string", e);
+            } catch (MalformedURLException e) {
+                Log.d(CommonString.DEBUG_TAG, "Found malformed URL", e);
+            } catch (IOException e) {
+                Log.d(CommonString.DEBUG_TAG, "Found IO exception", e);
             }
             return properties;
         }
