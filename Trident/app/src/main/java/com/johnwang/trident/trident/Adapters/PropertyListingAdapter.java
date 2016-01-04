@@ -1,6 +1,8 @@
 package com.johnwang.trident.trident.Adapters;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +38,15 @@ public class PropertyListingAdapter extends ArrayAdapter<Property> {
         }
         ImageView thumbnail = (ImageView) convertView.findViewById(R.id.property_listing_thumbnail);
         thumbnail.setImageBitmap(properties.get(position).getThumbnail());
+        final int p = position;
+        thumbnail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(properties.get(p).getDetailUrl()));
+                context.startActivity(intent);
+            }
+        });
+
         TextView streetName = (TextView) convertView.findViewById(R.id.property_listing_street_name);
         streetName.setText(properties.get(position).getStreetName());
         TextView price = (TextView) convertView.findViewById(R.id.property_listing_price);

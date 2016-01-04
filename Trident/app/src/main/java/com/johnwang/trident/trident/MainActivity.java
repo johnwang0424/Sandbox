@@ -1,11 +1,15 @@
 package com.johnwang.trident.trident;
 
+import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.johnwang.trident.trident.Adapters.PropertyListingAdapter;
@@ -82,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(List<Property> properties) {
+        protected void onPostExecute(final List<Property> properties) {
             PropertyListingAdapter adapter = new PropertyListingAdapter(MainActivity.this,
                     R.layout.property_listing_item, properties);
             propertyListing.setAdapter(adapter);
@@ -112,9 +116,11 @@ public class MainActivity extends AppCompatActivity {
                     Property p = new Property();
                     p.setStreetName(listings.getJSONObject(a).getString(CommonString.ZOOPLA_JSON_STREET_NAME));
                     p.setAgentPhone(listings.getJSONObject(a).getString(CommonString.ZOOPLA_JSON_AGENT_PHONE));
-                    p.setPrice(listings.getJSONObject(a).getString(CommonString.ZOOPLA_JSON_PRICE));
+                    p.setPrice(listings.getJSONObject(a).getJSONObject(CommonString.ZOOPLA_JSON_PRICE).
+                            getString(CommonString.ZOOPLA_JSON_PRICE_PER_MONTH));
                     URL url = new URL(listings.getJSONObject(a).getString(CommonString.ZOOPLA_JSON_THUMBNAIL_URL));
                     p.setThumbnail(BitmapFactory.decodeStream(url.openConnection().getInputStream()));
+                    p.setDetailUrl(listings.getJSONObject(a).getString(CommonString.ZOOPLA_JSON_DETAIL_URL));
                     properties.add(p);
                 }
             } catch (JSONException e) {

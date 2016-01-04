@@ -10,6 +10,15 @@ public class Property {
     private String agentPhone;
     private String price;
     private Bitmap thumbnail;
+    private String detailUrl;
+
+    public String getDetailUrl() {
+        return detailUrl;
+    }
+
+    public void setDetailUrl(String detailUrl) {
+        this.detailUrl = detailUrl;
+    }
 
     public Bitmap getThumbnail() {
         return thumbnail;
